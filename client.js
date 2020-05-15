@@ -133,7 +133,7 @@ const Star = ({highlighted, onClick, note}) => {
     return <svg style={{cursor: 'pointer'}}data-note={note} onClick={onClick} width="32" height="32">{s1}{s2}</svg>;
 };
 
-const Feedback = ({subject, userKey}) => {
+const Feedback = ({subject, userKey, lastOne}) => {
     const [submitted, setSubmitted] = useState(false);
     const textRef = useRef(null);
     const [note, setNote] = useState(0);
@@ -169,7 +169,11 @@ const Feedback = ({subject, userKey}) => {
             <p>Your feedback:</p>
             <p><FeedbackArea key={subject} ref={textRef} onChange={handleChange}/></p>
             {submitted && <p style={{color: '#080'}}>Feedback sent to the poll.</p>}
-            {!submitted && <p><button>Submit</button></p>}
+            {!submitted
+             && <p>
+                  <button>Submit</button>
+                  {lastOne && <span style={{fontStyle:'italic'}}> (You are the last one)</span>}
+                </p>}
         </form>
     );
 };
@@ -238,7 +242,12 @@ const Admin = () => {
                     <p style={{fontWeight: 'bold'}}>Finish</p>
                     <Flex />
                     <form onSubmit={onForceResults}>
-                        <Warning><p>This will force the display of received results, even if some are missing.</p></Warning>
+                        <Warning>
+                            <p>
+                                This will force the display of received results,
+                                even if some are missing.
+                            </p>
+                        </Warning>
                         <p><button>Force Results</button></p>
                     </form>
                 </AdminWidget>
@@ -301,7 +310,9 @@ const Root = () => {
             <Content>
                 {showIntro && <Intro />}
                 {showFeedback && <Pending {...pending} />}
-                {showFeedback && <Feedback userKey={key} subject={subject} />}
+                {showFeedback &&
+                 <Feedback userKey={key} subject={subject}
+                           lastOne={pending.expected-pending.received===1}/>}
                 {showReview && <Results {...results} />}
                 <Admin />
                 <Info>
