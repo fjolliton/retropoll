@@ -1,13 +1,14 @@
 import asyncio
 import json
 import random
+import argparse
 
 from pathlib import Path
 
 from aiohttp import web
 
-BIND = '127.0.0.1'
-PORT = 8666
+DEFAULT_HOST = '127.0.0.1'
+DEFAULT_PORT = 8666
 
 SCRIPT = Path('client.js').read_text()
 
@@ -38,6 +39,10 @@ RESULTS = []
 HISTOGRAM = None # or [<int>] * 6
 
 CONNECTIONS = []
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-H', '--host', help='Host to bind', type=str, default=DEFAULT_HOST)
+parser.add_argument('-p', '--port', help='Port to bind', type=int, default=DEFAULT_PORT)
 
 
 def flush():
@@ -134,14 +139,19 @@ async def event_handler(request):
         CONNECTIONS[:] = filter(lambda item: item[0] is not response, CONNECTIONS)
 
 
-async def run(app):
+async def run(app, listen):
     runner = web.AppRunner(app)
     await runner.setup()
-    site = web.TCPSite(runner, BIND, PORT)
-    await site.start()
+    for host, port in listen:
+        site = web.TCPSite(runner, host, port)
+        await site.start()
+        print(f'Listening on http://{host}:{port}/')
 
 
 def main():
+    ns = parser.parse_args()
+    host = ns.host
+    port = ns.port
     app = web.Application()
     app.add_routes([
         web.get('/', handler),
@@ -149,5 +159,5 @@ def main():
         web.post('/api', api_handler),
     ])
     loop = asyncio.get_event_loop()
-    loop.create_task(run(app))
+    loop.create_task(run(app, [(host, port)]))
     loop.run_forever()
