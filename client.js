@@ -343,8 +343,8 @@ const Root = () => {
             <Title>RetroPoll</Title>
             <Content>
                 {!connected && <Warning>Disconnected</Warning>}
+                <Pending {...pending} />
                 {showIntro && <Intro />}
-                {showFeedback && <Pending {...pending} />}
                 {showFeedback &&
                  <Feedback userKey={key} subject={subject}
                            lastOne={pending.expected-pending.received===1}/>}
