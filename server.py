@@ -90,6 +90,7 @@ async def broadcast(data):
 
 async def push_state(target=None, extra={}):
     data = {
+        'version': 2,
         'state': STATE,
         'subject': CURRENT_SUBJECT,
         'pending': {

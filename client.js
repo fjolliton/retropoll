@@ -300,10 +300,13 @@ const Intro = () => {
 
 const Root = () => {
     const [currentState, setCurrentState] = useState('unsynchronized');
+    const [currentVersion, setCurrentVersion] = useState(null);
     const [subject, setSubject] = useState(null);
     const [pending, setPending] = useState({});
     const [results, setResults] = useState({});
     const [connected, setConnected] = useState(false);
+    const versionRef = useRef(null);
+    versionRef.current = currentVersion;
     const key = useUserKey();
     useEffect(() => {
         const connect = () => {
@@ -321,6 +324,11 @@ const Root = () => {
                 // First message after connecting is full state
                 const message = JSON.parse(e.data);
                 console.log('Message:', message);
+                if ('version' in message) {
+                    if (versionRef.current !== null && versionRef.current !== message.version)
+                        alert("Site updated. Please reload this page.");
+                    setCurrentVersion(message.version);
+                }
                 if ('state' in message)
                     setCurrentState(message.state);
                 if ('subject' in message)
@@ -351,6 +359,7 @@ const Root = () => {
                 {showReview && <Results {...results} />}
                 <Admin />
                 <Info>
+                    <p>Version: {currentVersion != null ? currentVersion : '-'}</p>
                     <p>State: {currentState}</p>
                     <p>Key: {key}</p>
                 </Info>
