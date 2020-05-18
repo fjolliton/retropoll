@@ -85,6 +85,7 @@ const AdminWarning = styled.div`
 
 const AdminPanel = styled.div`
   display: flex;
+  flex-wrap: wrap;
 `;
 
 const AdminWidget = styled.div`
@@ -94,7 +95,7 @@ const AdminWidget = styled.div`
   padding: 0 1em;
   display: inline-flex;
   flex-direction: column;
-  width: 400px;
+  width: 365px;
   background: white;
   box-shadow: 2px 2px 4px rgba(0,0,0,.05);
 `;
@@ -229,6 +230,11 @@ const Admin = () => {
         call({action: 'force-results'});
         setShowAdmin(false);
     }, []);
+    const onReset = useCallback(event => {
+        event.preventDefault();
+        call({action: 'reset'});
+        setShowAdmin(false);
+    }, []);
     const toggleShowAdmin = useCallback(() => {
         setShowAdmin(!showAdmin);
     }, [showAdmin]);
@@ -240,7 +246,7 @@ const Admin = () => {
                 <AdminWidget>
                     <form onSubmit={onChangeSubject}>
                         <p style={{fontWeight: 'bold'}}>New poll</p>
-                        <p>Subject: <input ref={subjectRef} type="text" /></p>
+                        <p style={{display: 'flex'}}>Subject: <input ref={subjectRef} type="text" style={{flex: 1, marginLeft: '.5em'}} /></p>
                         <AdminWarning><p>This will reset all user sessions.</p></AdminWarning>
                         <p><button>Create</button></p>
                     </form>
@@ -256,6 +262,20 @@ const Admin = () => {
                             </p>
                         </AdminWarning>
                         <p><button>Force Results</button></p>
+                    </form>
+                </AdminWidget>
+                <AdminWidget>
+                    <p style={{fontWeight: 'bold'}}>Reset</p>
+                    <Flex />
+                    <form onSubmit={onReset}>
+                        <AdminWarning>
+                            <p>
+                                THIS WILL RESET THE SERVER STATE. This is useful
+                                if some participants are no longer connected and
+                                should be removed.
+                            </p>
+                        </AdminWarning>
+                        <p><button style={{color: 'red'}}>Reset Everything</button></p>
                     </form>
                 </AdminWidget>
             </AdminPanel>}
@@ -309,6 +329,8 @@ const Root = () => {
                     setPending(message.pending);
                 if ('results' in message)
                     setResults(message.results);
+                if ('reset' in message)
+                    call({action: 'declare-key', key: localStorage.getItem('key')});
             });
         };
         connect();

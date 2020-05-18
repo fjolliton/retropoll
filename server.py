@@ -50,17 +50,33 @@ def flush():
     global RESULTS
     global STATE
     global HISTOGRAM
-    items = [item['text'] for item in PENDING_RESULTS.values() if item['text'].strip()]
-    random.shuffle(items)
     HISTOGRAM = [0] * 6 # 0..5
     for item in PENDING_RESULTS.values():
         if item['note'] is not None:
             HISTOGRAM[item['note']] += 1
     if HISTOGRAM == [0] * 6:
         HISTOGRAM = None
+    items = [
+        item['text'] if HISTOGRAM is None else f'{item["text"]} [{item["note"]}/5]'
+        for item in PENDING_RESULTS.values()
+        if item['text'].strip()
+    ]
+    random.shuffle(items)
     PENDING_RESULTS = {}
     RESULTS = items
     STATE = 'review'
+
+
+def reset():
+    global PENDING_RESULTS
+    global RESULTS
+    global STATE
+    global HISTOGRAM
+    STATE = 'initial'
+    PARTICIPANTS.clear()
+    PENDING_RESULTS = {}
+    RESULTS = []
+    HISTOGRAM = None
 
 
 async def broadcast(data):
@@ -121,6 +137,9 @@ async def api_handler(request):
             flush()
     elif action == 'force-results':
         flush()
+    elif action == 'reset':
+        reset()
+        extra['reset'] = True
     await push_state(extra=extra)
     data = {'success': True}
     return web.Response(text=json.dumps(data), content_type='application/json')
