@@ -10,7 +10,7 @@ const call = (data) => {
 };
 
 const Info = styled.div`
-  color: rgba(0,0,0,.3);
+  color: rgba(0,0,0,.4);
   margin: 1em;
 `;
 
@@ -351,9 +351,13 @@ const Root = () => {
                 {showReview && <Results {...results} />}
                 <Admin />
                 <Info>
-                    <p>Version: {currentVersion != null ? currentVersion : '-'}</p>
-                    <p>State: {currentState}</p>
-                    <p>Key: {key}</p>
+                    <p>
+                        Key: {key}
+                        {' | '}
+                        Version: {currentVersion != null ? currentVersion : '-'}
+                        {' | '}
+                        State: {currentState}
+                    </p>
                 </Info>
             </Content>
         </Container>
