@@ -24,21 +24,6 @@ const NoteChoice = styled.div`
   display: flex;
 `;
 
-const Zero = styled.div`
-  display: inline-block;
-  width: 32px;
-  height: 32px;
-  align-self: center;
-  text-align: center;
-  border: 2px solid rgba(0,0,0,.6);
-  border-radius: 3px;
-  margin: 0 4px;
-  line-height: 28px;
-  font-weight: bold;
-  font-size: 20px;
-  cursor: pointer;
-`;
-
 const PollResults = styled.div`
   margin: 1em;
 `;
@@ -152,8 +137,10 @@ const Feedback = ({subject, userKey, lastOne}) => {
         const n = +event.currentTarget.dataset.note;
         if (n !== note) {
             setNote(n);
-            setSubmitted(false);
+        } else {
+            setNote(n-1);
         }
+        setSubmitted(false);
     }, [note]);
     const onPostFeedback = (event) => {
         event.preventDefault();
@@ -170,7 +157,6 @@ const Feedback = ({subject, userKey, lastOne}) => {
             <h2>Subject: {subject}</h2>
             <NoteChoice>
                 <span style={{lineHeight: '32px'}}>Note:</span>
-                <Zero data-note="0" onClick={handleNoteChange}>0</Zero>
                 {[...Array(5)].map((_, i) => <Star key={i+1} highlighted={i+1<=note} note={i+1} onClick={handleNoteChange} />)}
                 <span style={{marginLeft: '1em', fontWeight: 'bold', fontSize: '20px', lineHeight: '32px'}}> {note} / 5</span>
             </NoteChoice>
