@@ -54,7 +54,7 @@ def flush():
     for item in PENDING_RESULTS.values():
         if item['note'] is not None:
             HISTOGRAM[item['note']] += 1
-    if HISTOGRAM == [0] * 6:
+    if HISTOGRAM[1:] == [0] * 5:
         HISTOGRAM = None
     items = [
         item['text'] if HISTOGRAM is None else f'{item["text"]} [{item["note"]}/5]'
