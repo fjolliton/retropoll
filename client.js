@@ -72,6 +72,13 @@ const Line = styled.div`
 `;
 
 const Warning = styled.div`
+  font-weight: bold;
+  color: red;
+  text-align: center;
+  margin: .5em;
+`;
+
+const AdminWarning = styled.div`
   font-style: italic;
   font-size: 80%;
 `;
@@ -234,7 +241,7 @@ const Admin = () => {
                     <form onSubmit={onChangeSubject}>
                         <p style={{fontWeight: 'bold'}}>New poll</p>
                         <p>Subject: <input ref={subjectRef} type="text" /></p>
-                        <Warning><p>This will reset all user sessions.</p></Warning>
+                        <AdminWarning><p>This will reset all user sessions.</p></AdminWarning>
                         <p><button>Create</button></p>
                     </form>
                 </AdminWidget>
@@ -242,12 +249,12 @@ const Admin = () => {
                     <p style={{fontWeight: 'bold'}}>Finish</p>
                     <Flex />
                     <form onSubmit={onForceResults}>
-                        <Warning>
+                        <AdminWarning>
                             <p>
                                 This will force the display of received results,
                                 even if some are missing.
                             </p>
-                        </Warning>
+                        </AdminWarning>
                         <p><button>Force Results</button></p>
                     </form>
                 </AdminWidget>
@@ -276,13 +283,18 @@ const Root = () => {
     const [subject, setSubject] = useState(null);
     const [pending, setPending] = useState({});
     const [results, setResults] = useState({});
+    const [connected, setConnected] = useState(false);
     const key = useUserKey();
     useEffect(() => {
         const connect = () => {
             call({action: 'declare-key', key: localStorage.getItem('key')});
             const eventSource = new EventSource('/event');
+            eventSource.addEventListener('open', () => {
+                setConnected(true);
+            });
             eventSource.addEventListener('error', e => {
                 eventSource.close();
+                setConnected(false);
                 setTimeout(connect, 1000);
             });
             eventSource.addEventListener('message', e => {
@@ -308,6 +320,7 @@ const Root = () => {
         <Container>
             <Title>RetroPoll</Title>
             <Content>
+                {!connected && <Warning>Disconnected</Warning>}
                 {showIntro && <Intro />}
                 {showFeedback && <Pending {...pending} />}
                 {showFeedback &&
