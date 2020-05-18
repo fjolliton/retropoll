@@ -56,13 +56,6 @@ const Line = styled.div`
   margin: 1px 0;
 `;
 
-const Warning = styled.div`
-  font-weight: bold;
-  color: red;
-  text-align: center;
-  margin: .5em;
-`;
-
 const AdminWarning = styled.div`
   font-style: italic;
   font-size: 80%;
@@ -114,6 +107,19 @@ const Title = styled.h1`
 `;
 
 const Content = styled.div`
+  position: relative;
+`;
+
+const Warning = styled.div`
+  font-weight: bold;
+  color: red;
+  text-align: center;
+  position: absolute;
+  top: 0;
+  right: 1em;
+  padding: .25em .5em;
+  background: #ff000033;
+  border-radius: 3px;
 `;
 
 const Star = ({highlighted, onClick, note}) => {
